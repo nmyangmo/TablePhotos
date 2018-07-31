@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.yangmo.tablephotos.MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="已选择图片:"
+        android:id="@+id/tips_photo_choice"
+        android:visibility="gone"
+        android:padding="10dp"/>
+    <GridView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="10dp"
+        android:id="@+id/grid_view"
+        android:columnWidth="80dp"
+        android:horizontalSpacing="5dp"
+        android:verticalSpacing="5dp"
+        android:stretchMode="spacingWidthUniform"
+        android:numColumns="3"
+        android:layout_weight="1">
+
+    </GridView>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/image"
+        android:src="@mipmap/ic_launcher_round"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:text="选择照片"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:id="@+id/pick_photos"
+        android:onClick="onClick"/>
+
+</LinearLayout>
