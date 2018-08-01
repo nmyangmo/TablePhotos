@@ -9,7 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,8 +21,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.yangmo.tablephotos.matisseUtils.GifSizeFilter;
 import com.yangmo.tablephotos.matisseUtils.Glide4Engine;
@@ -36,16 +33,14 @@ import com.zhihu.matisse.internal.entity.SelectionSpec;
 import com.zhihu.matisse.listener.OnCheckedListener;
 import com.zhihu.matisse.listener.OnSelectedListener;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int REQUEST_CODE_CHOOSE = 23;
-    private GridView gridView;
     private PhotoAdapter mAdapter;
 
     @Override
@@ -56,14 +51,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initView() {
-        GridView recyclerView = (GridView) findViewById(R.id.grid_view);
+        GridView recyclerView =  findViewById(R.id.grid_view);
         recyclerView.setAdapter(mAdapter = new PhotoAdapter(this));
     }
 
     @Override
     public void onClick(final View v) {
         RxPermissions rxPermissions = new RxPermissions(this);
-        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE)
+        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
                 .subscribe(new Observer<Boolean>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -154,21 +149,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private class PhotoAdapter extends BaseAdapter{
-        private List<Uri> mUris=new ArrayList<>();
-        private  Drawable mPlaceholder;
+    private class PhotoAdapter extends BaseAdapter {
+        private List<Uri> mUris = new ArrayList<>();
+        private Drawable mPlaceholder;
         private Context context;
-        public PhotoAdapter(Context context){
-            this.context=context;
+
+        public PhotoAdapter(Context context) {
+            this.context = context;
             TypedArray ta = context.getTheme().obtainStyledAttributes(
                     new int[]{com.zhihu.matisse.R.attr.album_thumbnail_placeholder});
             mPlaceholder = ta.getDrawable(0);
         }
+
         void setData(List<Uri> uris) {
             mUris.clear();
-            mUris.addAll(uris) ;
+            mUris.addAll(uris);
             notifyDataSetChanged();
         }
+
         @Override
         public int getCount() {
             return mUris == null ? 0 : mUris.size();
@@ -199,12 +197,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     holder.photoView, mUris.get(position));
             return convertView;
         }
+
         class UriViewHolder extends RecyclerView.ViewHolder {
             private ImageView photoView;
 
             UriViewHolder(View contentView) {
                 super(contentView);
-                photoView =  contentView.findViewById(R.id.image_view);
+                photoView = contentView.findViewById(R.id.image_view);
             }
         }
     }

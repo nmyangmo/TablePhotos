@@ -9,19 +9,18 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
         classpath 'com.novoda:bintray-release:0.8.0'
-        classpath "com.tencent.bugly:tinker-support:1.1.2"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
 ext {
-    koo_versionCode = 100
-    koo_versionName = "1.0.0"
-    koo_minSdkVersion = 14
-    koo_targetSdkVersion = 27
-    koo_compileSdkVersion = 27
-    koo_buildToolsVersion = "27.1.1"
-    koo_applicationId = "com.yangmo.tablephotos"
+    versionCode = 120
+    versionName = "1.2.0"
+    minSdkVersion = 14
+    targetSdkVersion = 27
+    compileSdkVersion = 27
+    buildToolsVersion = "27.1.1"
+    applicationId = "com.yangmo.tablephotos"
 }
 allprojects {
     repositories {
