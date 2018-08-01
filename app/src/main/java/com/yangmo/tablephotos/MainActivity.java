@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             .captureStrategy(
                                                     new CaptureStrategy(true, "com.zhihu.matisse.sample.fileprovider"))
                                             .maxSelectable(9)
-                                            .addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K))
+                                            .addFilter(new GifSizeFilter(2, 2, 5 * Filter.K * Filter.K))
                                             .gridExpectedSize(
                                                     getResources().getDimensionPixelSize(R.dimen.grid_expected_size))
                                             .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
@@ -151,15 +151,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mAdapter.setData(Matisse.obtainResult(data));
             PreferencesUtil.setPhotoList(JSON.toJSONString(Matisse.obtainPathResult(data)));
             findViewById(R.id.tips_photo_choice).setVisibility(View.VISIBLE);
-            Log.e("OnActivityResult ", String.valueOf(Matisse.obtainOriginalState(data)));
-            Log.e("OnActivityResult ", JSONArray.toJSONString(Matisse.obtainPathResult(data)));
-            Log.e("OnActivityResult ", JSONArray.toJSONString(Matisse.obtainResult(data)));
-            List<String> list= PreferencesUtil.getPhotoList();
-            Uri uri= FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", new File(list.get(0)));
-            Log.e("OnActivityResult ", uri.toString());
-            Log.e("OnActivityResult ", uri.getPath());
-            ImageView imageView=findViewById(R.id.image);
-            imageView.setImageURI( uri);
         }
     }
 
