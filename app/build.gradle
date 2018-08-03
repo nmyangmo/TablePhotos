@@ -33,4 +33,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     compile 'com.alibaba:fastjson:1.2.47'
     compile(name: 'bugly_crashreport_upgrade-1.3.5', ext: 'aar')
+    compile 'com.huxq17.handygridview:handygridview:1.1.0'
 }

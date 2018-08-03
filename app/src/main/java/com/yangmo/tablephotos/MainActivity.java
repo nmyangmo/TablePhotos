@@ -16,11 +16,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.huxq17.handygridview.HandyGridView;
+import com.huxq17.handygridview.scrollrunner.OnItemMovedListener;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.yangmo.tablephotos.matisseUtils.GifSizeFilter;
 import com.yangmo.tablephotos.matisseUtils.Glide4Engine;
@@ -29,7 +32,6 @@ import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.filter.Filter;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
-import com.zhihu.matisse.internal.entity.SelectionSpec;
 import com.zhihu.matisse.listener.OnCheckedListener;
 import com.zhihu.matisse.listener.OnSelectedListener;
 
@@ -51,8 +53,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initView() {
-        GridView recyclerView =  findViewById(R.id.grid_view);
+        HandyGridView recyclerView =  findViewById(R.id.grid_view);
         recyclerView.setAdapter(mAdapter = new PhotoAdapter(this));
+        recyclerView.setMode(HandyGridView.MODE.LONG_PRESS);
     }
 
     @Override
@@ -143,14 +146,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
-            mAdapter.setData(Matisse.obtainResult(data));
+            mAdapter.setData(Matisse.obtainPathResult(data));
             PreferencesUtil.setPhotoList(JSON.toJSONString(Matisse.obtainPathResult(data)));
             findViewById(R.id.tips_photo_choice).setVisibility(View.VISIBLE);
         }
     }
 
-    private class PhotoAdapter extends BaseAdapter {
-        private List<Uri> mUris = new ArrayList<>();
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mAdapter.saveData();
+    }
+
+    private class PhotoAdapter extends BaseAdapter implements OnItemMovedListener {
+        private List<String> mUris = new ArrayList<>();
         private Drawable mPlaceholder;
         private Context context;
 
@@ -161,7 +170,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mPlaceholder = ta.getDrawable(0);
         }
 
-        void setData(List<Uri> uris) {
+        void saveData(){
+            PreferencesUtil.setPhotoList(JSON.toJSONString(mUris));
+        }
+        void setData(List<String> uris) {
             mUris.clear();
             mUris.addAll(uris);
             notifyDataSetChanged();
@@ -173,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         @Override
-        public Uri getItem(int position) {
+        public String getItem(int position) {
             return mUris.get(position);
         }
 
@@ -192,10 +204,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 holder = (UriViewHolder) convertView.getTag();
             }
-            SelectionSpec.getInstance().imageEngine.loadThumbnail(context, context.getResources().getDimensionPixelSize(com.zhihu.matisse.R
-                            .dimen.media_grid_size), mPlaceholder,
-                    holder.photoView, mUris.get(position));
+//            SelectionSpec.getInstance().imageEngine.loadThumbnail(context, context.getResources().getDimensionPixelSize(com.zhihu.matisse.R
+//                            .dimen.media_grid_size), mPlaceholder,
+//                    holder.photoView, mUris.get(position));
+            int resize=context.getResources().getDimensionPixelSize(com.zhihu.matisse.R
+                            .dimen.media_grid_size);
+            Glide.with(context)
+                    .asBitmap() // some .jpeg files are actually gif
+                    .load(mUris.get(position))
+                    .apply(new RequestOptions()
+                            .override(resize, resize)
+                            .placeholder(mPlaceholder)
+                            .centerCrop())
+                    .into(holder.photoView);
             return convertView;
+        }
+
+        @Override
+        public void onItemMoved(int from, int to) {
+            String s = mUris.remove(from);
+            mUris.add(to, s);
+        }
+
+        @Override
+        public boolean isFixed(int position) {
+//            if (position == 0) {  //首位不可拖动
+//                return true;
+//            }
+            return false;
         }
 
         class UriViewHolder extends RecyclerView.ViewHolder {

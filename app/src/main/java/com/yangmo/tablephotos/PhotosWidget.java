@@ -26,7 +26,7 @@ import static android.media.ThumbnailUtils.OPTIONS_RECYCLE_INPUT;
  * Implementation of App Widget functionality.
  */
 public class PhotosWidget extends AppWidgetProvider {
-
+    int count;
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
@@ -54,6 +54,7 @@ public class PhotosWidget extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
+        count++;
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
         }
