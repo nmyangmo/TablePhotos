@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,50 +7,32 @@
     android:orientation="vertical"
     android:background="@android:color/white"
     tools:context="com.yangmo.tablephotos.MainActivity">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="已选择图片:"
-        android:id="@+id/tips_photo_choice"
-        android:visibility="gone"
-        android:padding="10dp"/>
-    <!--<GridView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:padding="10dp"-->
-        <!--android:id="@+id/grid_view"-->
-        <!--android:columnWidth="80dp"-->
-        <!--android:horizontalSpacing="5dp"-->
-        <!--android:verticalSpacing="5dp"-->
-        <!--android:stretchMode="spacingWidthUniform"-->
-        <!--android:numColumns="3"-->
-        <!--android:layout_weight="1">-->
-
-    <!--</GridView>-->
-
-    <com.huxq17.handygridview.HandyGridView
-        android:id="@+id/grid_view"
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/white"
         android:clipChildren="false"
-        android:clipToPadding="false"
-        android:gravity="center"
-        android:horizontalSpacing="10dp"
-        android:numColumns="3"
-        android:layout_weight="1"
-        android:padding="10dp"
-        android:scrollbars="vertical"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="10dp" />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:text="选择照片"
-        android:gravity="center"
-        android:layout_weight="1"
-        android:id="@+id/pick_photos"
-        android:textColor="@color/colorAccent"
-        android:onClick="onClick"/>
+        app:tabGravity="fill"
+        app:tabBackground="@null"
+        app:tabIndicatorHeight="0dp"
+        app:tabMaxWidth="0dp"
+        app:tabMode="fixed" />
 
-</LinearLayout>
+    <View
+        android:id="@+id/view_line"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_above="@id/tabLayout"
+        android:background="#b2b2b2" />
+
+    <com.yangmo.tablephotos.view.CustomViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/view_line"
+        android:scrollbars="none" />
+
+
+</RelativeLayout>

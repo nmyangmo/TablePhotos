@@ -1,0 +1,47 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.yangmo.tablephotos.fragment.IndexFragment">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="已选择图片:"
+        android:id="@+id/tips_photo_choice"
+        android:visibility="gone"
+        android:padding="10dp"/>
+    <!-- TODO: Update blank fragment layout -->
+    <com.huxq17.handygridview.HandyGridView
+        android:id="@+id/grid_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:gravity="center"
+        android:horizontalSpacing="10dp"
+        android:numColumns="3"
+        android:layout_weight="1"
+        android:padding="10dp"
+        android:scrollbars="vertical"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="10dp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/text_empty_view"
+        android:visibility="gone"
+        android:gravity="center"
+        android:text="还没有图片，请先选择图片~"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:text="选择照片"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:id="@+id/pick_photos"
+        android:textColor="@color/colorAccent"
+        />
+
+</LinearLayout>

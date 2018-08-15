@@ -1,246 +1,133 @@
 package com.yangmo.tablephotos;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-import com.huxq17.handygridview.HandyGridView;
-import com.huxq17.handygridview.scrollrunner.OnItemMovedListener;
-import com.tbruyelle.rxpermissions2.RxPermissions;
-import com.yangmo.tablephotos.matisseUtils.GifSizeFilter;
-import com.yangmo.tablephotos.matisseUtils.Glide4Engine;
-import com.yangmo.tablephotos.utils.PreferencesUtil;
-import com.zhihu.matisse.Matisse;
-import com.zhihu.matisse.MimeType;
-import com.zhihu.matisse.filter.Filter;
-import com.zhihu.matisse.internal.entity.CaptureStrategy;
-import com.zhihu.matisse.listener.OnCheckedListener;
-import com.zhihu.matisse.listener.OnSelectedListener;
+import com.yangmo.tablephotos.adapter.FragmentAdapter;
+import com.yangmo.tablephotos.fragment.IndexFragment;
+import com.yangmo.tablephotos.fragment.MyFragment;
+import com.yangmo.tablephotos.rx.RxBus;
+import com.yangmo.tablephotos.view.CustomViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final int REQUEST_CODE_CHOOSE = 23;
-    private PhotoAdapter mAdapter;
+
+public class MainActivity extends BaseActivity {
+
+
+    private TabLayout mTabLayout;
+    private CustomViewPager mTabViewPager;
+    private IndexFragment mIndexFragment;
+    private MyFragment mMyFragment;
+    private List<Fragment> mTabFragments = new ArrayList<>();
+    private FragmentAdapter mTabAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        initTabFragments();
+        setTab();
     }
 
     private void initView() {
-        HandyGridView recyclerView =  findViewById(R.id.grid_view);
-        recyclerView.setAdapter(mAdapter = new PhotoAdapter(this));
-        recyclerView.setMode(HandyGridView.MODE.LONG_PRESS);
+        mTabLayout = findViewById(R.id.tabLayout);
+        mTabViewPager = findViewById(R.id.viewPager);
     }
 
-    @Override
-    public void onClick(final View v) {
-        RxPermissions rxPermissions = new RxPermissions(this);
-        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
-                .subscribe(new Observer<Boolean>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
 
-                    }
+    private void initTabFragments() {
+        if (getSupportFragmentManager() != null) {
+            mIndexFragment = (IndexFragment) getSupportFragmentManager().findFragmentByTag(IndexFragment.class.getSimpleName());
+            mMyFragment = (MyFragment) getSupportFragmentManager().findFragmentByTag(MyFragment.class.getSimpleName());
+        }
 
-                    @Override
-                    public void onNext(Boolean aBoolean) {
-                        if (aBoolean) {
-                            switch (v.getId()) {
-                                case R.id.pick_photos:
-                                    Matisse.from(MainActivity.this)
-                                            .choose(MimeType.ofAll(), false)
-                                            .countable(true)
-                                            .capture(true)
-                                            .captureStrategy(
-                                                    new CaptureStrategy(true, "com.zhihu.matisse.sample.fileprovider"))
-                                            .maxSelectable(9)
-                                            .addFilter(new GifSizeFilter(2, 2, 5 * Filter.K * Filter.K))
-                                            .gridExpectedSize(
-                                                    getResources().getDimensionPixelSize(R.dimen.grid_expected_size))
-                                            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-                                            .thumbnailScale(0.85f)
-                                            // for glide-V3
-//                                            .imageEngine(new GlideEngine())
-                                            // for glide-V4
-                                            .imageEngine(new Glide4Engine())
-                                            .setOnSelectedListener(new OnSelectedListener() {
-                                                @Override
-                                                public void onSelected(
-                                                        @NonNull List<Uri> uriList, @NonNull List<String> pathList) {
-                                                    // DO SOMETHING IMMEDIATELY HERE
-                                                    Log.e("onSelected", "onSelected: pathList=" + pathList);
+        if (mIndexFragment == null) {
+            mIndexFragment = IndexFragment.newInstance("", "");
+        }
 
-                                                }
-                                            })
-                                            .originalEnable(true)
-                                            .maxOriginalSize(10)
-                                            .setOnCheckedListener(new OnCheckedListener() {
-                                                @Override
-                                                public void onCheck(boolean isChecked) {
-                                                    // DO SOMETHING IMMEDIATELY HERE
-                                                    Log.e("isChecked", "onCheck: isChecked=" + isChecked);
-                                                }
-                                            })
-                                            .forResult(REQUEST_CODE_CHOOSE);
-                                    break;
-//                                case R.id.dracula:
-//                                    Matisse.from(MainActivity.this)
-//                                            .choose(MimeType.ofImage())
-//                                            .theme(R.style.Matisse_Dracula)
-//                                            .countable(false)
-//                                            .addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K))
-//                                            .maxSelectable(9)
-//                                            .originalEnable(true)
-//                                            .maxOriginalSize(10)
-//                                            .imageEngine(new PicassoEngine())
-//                                            .forResult(REQUEST_CODE_CHOOSE);
-//                                    break;
-                                default:
-                                    break;
-                            }
-                        } else {
-                            Toast.makeText(MainActivity.this, R.string.permission_request_denied, Toast.LENGTH_LONG)
-                                    .show();
+
+        if (mMyFragment == null) {
+            mMyFragment = mMyFragment.newInstance("", "");
+        }
+        mTabFragments.add(mIndexFragment);
+        mTabFragments.add(mMyFragment);
+    }
+
+    private void setTab() {
+        mTabAdapter = new FragmentAdapter(getSupportFragmentManager(), mTabFragments);
+        mTabViewPager.setAdapter(mTabAdapter);
+//        mTabViewPager.setOffscreenPageLimit(3);
+        mTabViewPager.setScanScroll(true);
+        mTabViewPager.setCurrentItem(0, false);
+
+        mTabLayout.setupWithViewPager(mTabViewPager);
+        mTabLayout.setTabMode(TabLayout.MODE_FIXED);
+        mTabLayout.getTabAt(0).setCustomView(R.layout.activity_main_tab1);
+        mTabLayout.getTabAt(1).setCustomView(R.layout.activity_main_tab2);
+        mTabLayout.getTabAt(0).getCustomView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TabLayout.Tab tab = mTabLayout.getTabAt(0);
+                if (tab != null) {
+                    tab.select();
+                }
+            }
+        });
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                mTabViewPager.setCurrentItem(tab.getPosition(), false);
+                if (tab.getPosition() == 0) {
+                } else if (tab.getPosition() == 1) {
+                }
+
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+    }
+
+    private void subscriptionRxBus() {
+        try {
+            RxBus.getInstance()
+                    .toObserverable(Message.class)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe(new Consumer<Disposable>() {
+                        @Override
+                        public void accept(@NonNull Disposable disposable) throws Exception {
+                            addSubscrebe(disposable);
                         }
-                    }
+                    })
+                    .subscribe(new Consumer<Message>() {
+                        @Override
+                        public void accept(@NonNull Message message) {
+                            switch (message.what) {
 
-                    @Override
-                    public void onError(Throwable e) {
+                            }
+                        }
+                    });
+        } catch (Exception e) {
 
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
-            mAdapter.setData(Matisse.obtainPathResult(data));
-            PreferencesUtil.setPhotoList(JSON.toJSONString(Matisse.obtainPathResult(data)));
-            findViewById(R.id.tips_photo_choice).setVisibility(View.VISIBLE);
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mAdapter.saveData();
-    }
-
-    private class PhotoAdapter extends BaseAdapter implements OnItemMovedListener {
-        private List<String> mUris = new ArrayList<>();
-        private Drawable mPlaceholder;
-        private Context context;
-
-        public PhotoAdapter(Context context) {
-            this.context = context;
-            TypedArray ta = context.getTheme().obtainStyledAttributes(
-                    new int[]{com.zhihu.matisse.R.attr.album_thumbnail_placeholder});
-            mPlaceholder = ta.getDrawable(0);
-        }
-
-        void saveData(){
-            PreferencesUtil.setPhotoList(JSON.toJSONString(mUris));
-        }
-        void setData(List<String> uris) {
-            mUris.clear();
-            mUris.addAll(uris);
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public int getCount() {
-            return mUris == null ? 0 : mUris.size();
-        }
-
-        @Override
-        public String getItem(int position) {
-            return mUris.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            UriViewHolder holder;
-            if (convertView == null) {
-                convertView = LayoutInflater.from(context).inflate(R.layout.photo_item, null);
-                holder = new UriViewHolder(convertView);
-                convertView.setTag(holder);
-            } else {
-                holder = (UriViewHolder) convertView.getTag();
-            }
-//            SelectionSpec.getInstance().imageEngine.loadThumbnail(context, context.getResources().getDimensionPixelSize(com.zhihu.matisse.R
-//                            .dimen.media_grid_size), mPlaceholder,
-//                    holder.photoView, mUris.get(position));
-            int resize=context.getResources().getDimensionPixelSize(com.zhihu.matisse.R
-                            .dimen.media_grid_size);
-            Glide.with(context)
-                    .asBitmap() // some .jpeg files are actually gif
-                    .load(mUris.get(position))
-                    .apply(new RequestOptions()
-                            .override(resize, resize)
-                            .placeholder(mPlaceholder)
-                            .centerCrop())
-                    .into(holder.photoView);
-            return convertView;
-        }
-
-        @Override
-        public void onItemMoved(int from, int to) {
-            String s = mUris.remove(from);
-            mUris.add(to, s);
-        }
-
-        @Override
-        public boolean isFixed(int position) {
-//            if (position == 0) {  //首位不可拖动
-//                return true;
-//            }
-            return false;
-        }
-
-        class UriViewHolder extends RecyclerView.ViewHolder {
-            private ImageView photoView;
-
-            UriViewHolder(View contentView) {
-                super(contentView);
-                photoView = contentView.findViewById(R.id.image_view);
-            }
-        }
-    }
 }
